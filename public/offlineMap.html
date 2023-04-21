@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="maps.js"></script>
+    <style>
+      body,
+      #container {
+        margin: 0px;
+        padding: 0px;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        overflow: hidden;
+      }
+      .amap-layer {
+        filter: invert(100%);
+      }
+    </style>
+  </head>
+  <body onload="initMap()">
+    <div id="container"></div>
+    <script>
+      function initMap() {
+        var map = new AMap.Map('container', {
+          zoom: 15,
+          //下载范围的中心点
+          center: [113.392987, 23.051086],
+          zooms: [14, 15]
+        });
+
+        let tileUrl = 'http://127.0.0.1:5500/public/tiles/[z]/[y]/[x].png';
+        let xyzLayer = new AMap.TileLayer({
+          // 瓦片地图地址，一定要用function,直接字符串，默认走https就404了
+          getTileUrl: function (x, y, z) {
+            return tileUrl.replace('[x]', x).replace('[y]', y).replace('[z]', z);
+          },
+          //限制缩放等级为下载的等级
+          zooms: [14, 15],
+          zIndex: 10,
+          tileSize: 256
+        });
+        map.add(xyzLayer);
+        let b = [113.353114, 23.02803, 113.43286, 23.074142];
+        //限制范围，避免加载到空瓦片
+        let bounds = new AMap.Bounds([b[2], b[3]], [b[0], b[1]]);
+
+        map.setBounds(bounds);
+        map.setLimitBounds(bounds);
+      }
+    </script>
+  </body>
+</html>
