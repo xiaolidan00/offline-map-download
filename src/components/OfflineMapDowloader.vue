@@ -309,9 +309,7 @@
             }&x=${x}&y=${y}&z=${z}`,
             (res) => {
               this.theZip.file(`tiles/${z}/${y}/${x}.png`, res);
-              setTimeout(() => {
-                resolve();
-              }, 10);
+              resolve();
             }
           );
         });
@@ -346,7 +344,7 @@
         let tiles = this.getTileLayer();
         this.$msgbox({
           title: '是否下载?',
-          message: `大概需要${(tiles.length * 0.1).toFixed(2)}秒`,
+          message: `大概需要${(tiles.length * 0.1 / 6).toFixed(2)}秒`,
           showConfirmButton: true,
           showCancelButton: true
         }).then(() => {
@@ -357,11 +355,28 @@
             JSZip.loadAsync(res).then(async (zip) => {
               this.theZip = zip;
 
-              for (let i = 0; i < tiles.length; i++) {
-                let item = tiles[i];
-                await this.writeBlob(item.x, item.y, item.z);
-                this.process = ((i / tiles.length) * 100).toFixed(2);
+              // 同时下载6个，因为高德地图服务器http1.1的限制,并发数为通常为6
+              for (let i = 0; i < tiles.length; i += 6) {
+
+                if (i + 5 >= tiles.length) {
+                  for (let j = i; j < tiles.length; j++) {
+                    await this.writeBlob(tiles[j].x, tiles[j].y, tiles[j].z);
+                  }
+                  this.process = 100;
+                  break;
+                }
+
+                await Promise.all([
+                  this.writeBlob(tiles[i].x, tiles[i].y, tiles[i].z),
+                  this.writeBlob(tiles[i + 1].x, tiles[i + 1].y, tiles[i + 1].z),
+                  this.writeBlob(tiles[i + 2].x, tiles[i + 2].y, tiles[i + 2].z),
+                  this.writeBlob(tiles[i + 3].x, tiles[i + 3].y, tiles[i + 3].z),
+                  this.writeBlob(tiles[i + 4].x, tiles[i + 4].y, tiles[i + 4].z),
+                  this.writeBlob(tiles[i + 5].x, tiles[i + 5].y, tiles[i + 5].z)
+                ]);
+                this.process = (((i + 5) / tiles.length) * 100).toFixed(2);
               }
+
               this.theZip.file(
                 `README.md`,
                 `# 文件夹目录\n${this.rule}\n\n# 当前地图瓦片 \n 范围：${this.rectLngLat}\n中心点:${this.centerLnglat}`
