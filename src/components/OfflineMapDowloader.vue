@@ -1,6 +1,7 @@
 <template>
   <div class="offline-amap-container">
     <div class="search-container">
+      <input placeholder="请输入高德地图带Key的URL,例如: https://webapi.amap.com/maps?v=2.0&key=xxx" type="input" v-model="key" style="width: 606px;" />
       <select v-model="selectType" style="margin-right: 1px">
         <option value="area">区域</option>
         <option value="address">地点</option>
@@ -148,7 +149,8 @@
       selectCity: '',
       city: [],
       selectArea: '',
-      area: []
+      area: [],
+      key: '',
     }),
     computed: {
       tableData() {
@@ -212,9 +214,45 @@
         } else {
           this.selectArea = '';
         }
+      },
+      key() {
+        if (this.key.includes('key=') && this.key.includes('v=2.0')) {
+				let script = document.createElement('script');
+				script.src = this.key;
+				document.head.appendChild(script);
+				script.onload = () => {
+					this.initMap();
+				};
+			}
       }
     },
     methods: {
+      initMap() {
+			this.map = new AMap.Map(this.$refs.canvas, {
+				resizeEnable: true,
+				zoom: this.zoom,
+				center: [this.lng, this.lat]
+			});
+			this.marker = new AMap.Marker();
+			this.marker.setPosition([this.lng, this.lat]);
+			this.map.add(this.marker);
+			this.map.on('zoomend', () => {
+				this.zoomCenter();
+			});
+			this.map.on('moveend', () => {
+				this.zoomCenter();
+			});
+
+			AMap.plugin(
+				['AMap.MouseTool', 'AMap.Geocoder', 'AMap.DistrictSearch', 'AMap.RectangleEditor'],
+				() => {
+					this.mouseTool = new AMap.MouseTool(this.map);
+					this.geocoder = new AMap.Geocoder({});
+
+					this.getDistrict('province', '100000');
+				}
+			);
+		},
       onEditRectEnd() {
         this.rectangleEditor.close();
       },
@@ -434,30 +472,9 @@
       }
     },
     mounted() {
-      this.map = new AMap.Map(this.$refs.canvas, {
-        resizeEnable: true,
-        zoom: this.zoom,
-        center: [this.lng, this.lat]
-      });
-      this.marker = new AMap.Marker();
-      this.marker.setPosition([this.lng, this.lat]);
-      this.map.add(this.marker);
-      this.map.on('zoomend', () => {
-        this.zoomCenter();
-      });
-      this.map.on('moveend', () => {
-        this.zoomCenter();
-      });
-
-      AMap.plugin(
-        ['AMap.MouseTool', 'AMap.Geocoder', 'AMap.DistrictSearch', 'AMap.RectangleEditor'],
-        () => {
-          this.mouseTool = new AMap.MouseTool(this.map);
-          this.geocoder = new AMap.Geocoder({});
-
-          this.getDistrict('province', '100000');
-        }
-      );
+      if (window.AMap) {
+        this.initMap();
+      }
     }
   };
 </script>
