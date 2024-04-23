@@ -151,6 +151,7 @@
       selectArea: '',
       area: [],
       key: '',
+      isLoading: false,
     }),
     computed: {
       tableData() {
