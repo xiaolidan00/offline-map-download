@@ -24,12 +24,7 @@ class Transformation {
     return [x, y];
   }
 }
-export type ProjConfigType = {
-  name: string;
-  config: string;
-  origin?: LngLatXY;
-  resolutions?: number[];
-};
+
 function closestElement(array: number[], element: number) {
   let low;
   for (let i = array.length; i--; ) {
@@ -39,12 +34,20 @@ function closestElement(array: number[], element: number) {
   }
   return low;
 }
+export type ProjConfigType = {
+  name: string;
+  config: string;
+  origin?: LngLatXY;
+  resolutions?: number[];
+};
 const EARTH_R = 6378137;
 export const getProjection = (projConfig: ProjConfigType, tileSize = 256) => {
   const {name, config, origin, resolutions} = projConfig;
+  //定义投影
   proj4.defs(name, config);
 
   const scales: number[] = [];
+  //lods配置
   if (resolutions?.length) {
     for (let i = resolutions.length - 1; i >= 0; i--) {
       if (resolutions[i]) {
@@ -53,8 +56,14 @@ export const getProjection = (projConfig: ProjConfigType, tileSize = 256) => {
     }
   }
   return {
+    origin,
+    name,
+    config,
+    resolutions,
+    _scales: scales,
     //坐标偏移
     transformation: (function () {
+      //原点位置偏移
       if (origin?.length) {
         return new Transformation(1, -origin[0], -1, origin[1]);
       }
@@ -71,6 +80,7 @@ export const getProjection = (projConfig: ProjConfigType, tileSize = 256) => {
     },
     //该缩放等级的像素大小
     scale(zoom: number) {
+      //lods等级的像素大小
       if (resolutions?.length) {
         let iZoom = Math.floor(zoom),
           baseScale,
@@ -92,6 +102,7 @@ export const getProjection = (projConfig: ProjConfigType, tileSize = 256) => {
     },
     //该像素大小的缩放等级
     zoom(scale: number) {
+      //lods缩放等级
       if (resolutions?.length) {
         // Find closest number in this._scales, down
         let downScale = closestElement(scales, scale);

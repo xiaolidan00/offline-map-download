@@ -9,6 +9,9 @@ body,
   padding: 0px;
   overflow: hidden;
 }
+:root {
+  --el-text-color-regular: black !important;
+}
 * {
   box-sizing: border-box;
 }
@@ -16,15 +19,10 @@ body,
   height: 100%;
   width: 100%;
 }
-
-input[type='text'],
-input[type='number'],
-select {
-  outline: none;
-  border-radius: 4px;
-  border: solid 1px gray;
-  padding: 8px;
+.el-form-item {
+  margin-bottom: 10px !important;
 }
+
 .loading {
   position: fixed;
   left: 0px;
@@ -38,21 +36,6 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-button {
-  width: calc(50% - 5px);
-  border: none;
-  background-color: rgb(229 229 255);
-  color: blue;
-  border-radius: 4px;
-  height: 32px;
-  cursor: pointer;
-  &:hover,
-  &.active {
-    background-color: blue;
-    color: white;
-  }
 }
 
 .config-panel {
@@ -69,4 +52,52 @@ button {
   border-radius: 4px;
   box-shadow: 0 0 8px #ccc;
   backdrop-filter: blur(10px);
+}
+.geojson-item {
+  background-color: rgba(255, 255, 255, 0.3);
+  > div:first-child {
+    height: 40px;
+    line-height: 20px;
+    padding: 0 10px;
+    border-radius: 4px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    gap: 5px;
+    > span {
+      display: inline-block;
+      width: calc(100% - 25px);
+    }
+    i {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-style: normal;
+      height: 16px;
+      line-height: 16px;
+      width: 16px;
+    }
+    > i:first-child {
+      cursor: pointer;
+      font-size: 16px;
+
+      &.active {
+        transform: rotate(90deg);
+      }
+    }
+    > i :last-child {
+      border-radius: 50%;
+      cursor: pointer;
+      background-color: gray;
+      color: white;
+      font-size: 12px;
+
+      vertical-align: middle;
+      font-style: normal;
+    }
+  }
+  > div:last-child {
+    padding: 10px;
+  }
 }

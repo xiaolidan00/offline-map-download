@@ -31,7 +31,7 @@ export class EventEmitter {
   emit(event: string, ...args: any[]) {
     const fns = this.eventMap.get(event) as EventCallbacks;
     if (fns) {
-      fns.forEach((i: number, fn: Function) => {
+      fns.forEach((_i: number, fn: Function) => {
         fn(...args);
       });
     }

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="
+https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css
+" rel="stylesheet">
+    <script src="
+https://cdn.jsdelivr.net/npm/proj4@2.20.9/dist/proj4.min.js
+"></script>
+    <script src="
+https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js
+"></script>
+
+    <script src="
+https://cdn.jsdelivr.net/npm/proj4leaflet@1.0.2/src/proj4leaflet.min.js
+"></script>
+    <style>
+        #container,
+        body {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            top: 0px;
+            left: 0px;
+            padding: 0px;
+            margin: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script type="module">
+        // var crs = new L.Proj.CRS("EPSG:4547", '+proj=tmerc +lat_0=0 +lon_0=114 +k=1 +x_0=500000 +y_0=0 +ellps=GRS80 +units=m +no_defs',
+        //     {
+        //         origin: [-5123200, 10002100],
+        //         resolutions: [
+        //             132.291931250529, 79.3751587503175, 66.1459656252646, 31.750063500127, 15.8750317500635, 7.93751587503175, 3.96875793751588,
+        //             2.11667090000847, 1.05833545000423, 0.529167725002117, 0.264583862501058, 0.132291931250529, 0.0529167725002117, 0.0330729828126323,
+        //             0.0264583862501058, 0.0198437896875794,
+        //         ],
+        //     }
+        // );
+        const map = new L.map('container', {
+            // crs,
+            attributionControl: false,
+            doubleClickZoom: false,
+            preferCanvas: true,
+        })
+        map.setView([22.64371311736079, 113.937273986781], 11)
+
+        L.tileLayer(
+            '/demo/tiles/{z}/{y}/{x}.png',
+            {
+                tileSize: 256,
+            }
+        ).addTo(map)
+    </script>
+</body>
+
+</html>

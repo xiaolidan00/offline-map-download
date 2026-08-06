@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="
+https://cdn.jsdelivr.net/npm/ol@10.10.0/dist/ol.min.js
+"></script>
+    <link href="
+https://cdn.jsdelivr.net/npm/ol@10.10.0/ol.min.css
+" rel="stylesheet">
+    <style>
+        #map {
+            height: 1000px;
+            width: 1000px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+
+        new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.XYZ({
+                        url: '/demo/tiles/{z}/{y}/{x}.png',
+                        tileSize: 256
+                    }),
+
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([114.0869626738281, 22.629045999999985]),
+                zoom: 11
+            })
+        });
+    </script>
+</body>
+
+</html>

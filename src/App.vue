@@ -1,7 +1,7 @@
 <script setup lang="ts">
-  import {RouterView} from "vue-router";
+  import XYZGrid from './XYZGrid/XYZGrid.vue';
 </script>
 
 <template>
-  <RouterView></RouterView>
+  <XYZGrid></XYZGrid>
 </template>

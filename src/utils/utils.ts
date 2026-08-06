@@ -1,9 +1,22 @@
-import type JSZip from 'jszip';
-import type {LngLatXY} from './projection';
 import {cloneDeep} from 'lodash-es';
+import gcoord from 'gcoord';
+import {mapstore as state, store} from '../XYZGrid/store';
+import JSZip from 'jszip';
 
-export const downloadFile = (buffer: Blob, filename: string) => {
-  const url = URL.createObjectURL(new File([buffer], filename));
+export function convertBase64UrlToFile(base64: string, fileName: string) {
+  let parts = base64.split(';base64,');
+  let contentType = parts[0].split(':')[1];
+  let raw = window.atob(parts[1]);
+  let rawLength = raw.length;
+  let uInt8Array = new Uint8Array(rawLength);
+  for (let i = 0; i < rawLength; i++) {
+    uInt8Array[i] = raw.charCodeAt(i);
+  }
+  return new File([uInt8Array], fileName, {type: contentType});
+}
+export const downloadFile = (buffer: Blob | File, filename: string) => {
+  const f = buffer instanceof File ? buffer : new File([buffer], filename);
+  const url = URL.createObjectURL(f);
   const a = document.createElement('a');
   a.style = 'display: none';
   a.download = filename;
@@ -20,6 +33,10 @@ export const sleep = (time: number = 1000) => {
     }, time);
   });
 };
+export const isEmpty = (v: any) => {
+  if (v === undefined || v === '' || v === null || Number.isNaN(v)) return true;
+  return false;
+};
 export function getBlob(url: string) {
   return new Promise<Blob>((resolve, reject) => {
     fetch(url)
@@ -33,13 +50,7 @@ export function getBlob(url: string) {
   });
 }
 
-export const writeZip = async (
-  zip: JSZip,
-  url: string,
-  x: number,
-  y: number,
-  z: number
-) => {
+export const writeZip = async (zip: JSZip, url: string, x: number, y: number, z: number) => {
   try {
     const file = await getBlob(url);
     if (file) {
@@ -78,15 +89,13 @@ export type List2TreeConfig = {
   id: string;
   parentId: string;
   children: string;
-  rootId: any;
 };
 export function list2tree(
   data: any,
-  {id, parentId, children, rootId}: List2TreeConfig = {
+  {id, parentId, children}: List2TreeConfig = {
     id: 'id',
     parentId: 'parentId',
-    children: 'children',
-    rootId: undefined
+    children: 'children'
   }
 ) {
   const list = cloneDeep(data);
@@ -122,16 +131,28 @@ export function list2tree(
 
 export function travelGeo(geojson: any, cb: Function) {
   geojson.features.forEach((a: any) => {
-    if (a.geometry.type === 'MultiPolygon') {
+    const type = a.geometry.type.toLowerCase();
+    if (['multipolygon'].includes(type)) {
+      const t = type.replace('multi', '');
       a.geometry.coordinates.forEach((b: any) => {
         b.forEach((c: any) => {
-          cb(c, a.properties);
+          cb(c, {type: t, data: a.properties});
         });
       });
-    } else {
+    } else if (['multipoint', 'multilinestring', 'polygon', 'linestring'].includes(type)) {
+      const t = type.replace('multi', '');
       a.geometry.coordinates.forEach((c: any) => {
-        cb(c, a.properties);
+        cb(c, {type: t, data: a.properties});
       });
+    } else if ('point' === type) {
+      cb(a.geometry.coordinates, {type: type, data: a.properties});
+    } else if ('geometrycollection' === type) {
+      travelGeo(
+        {
+          features: a.geometries
+        },
+        cb
+      );
     }
   });
 }
@@ -151,4 +172,61 @@ export const uploadFile = (accept: string) => {
     document.body.appendChild(upload);
     upload.click();
   });
+};
+
+export const gcTowgs84 = (lng: number, lat: number) => {
+  return gcoord.transform([lng, lat], gcoord.GCJ02, gcoord.WGS84);
+};
+
+export const downloadZip = (queue: any[], start: number) => {
+  return new Promise(async (resolve) => {
+    const {minLevel, maxLevel} = state.value;
+
+    const zip = new JSZip();
+    //异步加载图片绘制到canvas上，http1.1的同一个域名下TCP并发连接数4-8个，通常6个。
+    for (let i = 0; i < queue.length; i += 6) {
+      const list = queue.slice(i, i + 6);
+      store.value.current = start + i;
+      await Promise.all(list.map((a) => writeZip(zip, a.url, a.x, a.y, a.z)));
+      await sleep();
+    }
+
+    zip
+      .generateAsync({type: 'blob'})
+      .then(function (content) {
+        downloadFile(
+          content,
+          `瓦片层级[${minLevel}-${maxLevel}][${start}]${new Date().getTime()}.zip`
+        );
+      })
+      .finally(() => {
+        resolve(start);
+      });
+  });
+};
+
+export const splitMapCanvas = (
+  zip: JSZip,
+  canvas: HTMLCanvasElement,
+  zoom: number,
+  tileSize: number,
+  queue: Array<{x: number; y: number}>
+) => {
+  let idx = 0;
+  for (let x = 0; x < canvas.width; x += tileSize) {
+    for (let y = 0; y < canvas.height; y += tileSize) {
+      const {x: x1, y: y1} = queue[idx];
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = tileSize;
+      tempCanvas.height = tileSize;
+      const tempctx = tempCanvas.getContext('2d')!;
+      tempctx.drawImage(canvas, x, y, tileSize, tileSize, 0, 0, tileSize, tileSize);
+
+      const base64 = tempCanvas.toDataURL('image/png');
+      const file = convertBase64UrlToFile(base64, zoom + '.png');
+
+      zip.file(`tiles/${zoom}/${y1}/${x1}.png`, file);
+      idx++;
+    }
+  }
 };

@@ -13,6 +13,5 @@ adcodeList.forEach((it) => {
 export const adcodes = list2tree(adcodeList, {
   children: 'children',
   id: 'adcode',
-  parentId: 'parent',
-  rootId: undefined
+  parentId: 'parent'
 });
