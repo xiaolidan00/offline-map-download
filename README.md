@@ -1,6 +1,6 @@
 # 不用钱！纯前端离线瓦片地图下载
 
-详细代码讲解请看掘金博客
+详细代码讲解请看掘金博客https://juejin.cn/spost/7671834850672427017
 
 ![alt text](image-1.png)
 ![alt text](image.png)
