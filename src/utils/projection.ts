@@ -98,7 +98,7 @@ export const getProjection = (projConfig: ProjConfigType, tileSize = 256) => {
           return baseScale + scaleDiff * zDiff;
         }
       }
-      return tileSize * Math.pow(2, zoom);
+      return 256 * Math.pow(2, zoom);
     },
     //该像素大小的缩放等级
     zoom(scale: number) {
@@ -126,7 +126,7 @@ export const getProjection = (projConfig: ProjConfigType, tileSize = 256) => {
         scaleDiff = nextScale - downScale;
         return (scale - downScale) / scaleDiff + downZoom;
       }
-      return Math.log(scale / tileSize) / Math.LN2;
+      return Math.log(scale / 256) / Math.LN2;
     },
     //经纬度转像素坐标
     lnglat2px(lnglat: LngLatXY, zoom: number): LngLatXY {
