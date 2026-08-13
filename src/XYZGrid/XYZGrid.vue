@@ -475,7 +475,7 @@
       };
       const id = `${code}${state.value.isFull ? '_full' : ''}`;
       if (cacheGeo[id]) {
-        drawArea(cacheGeo[code]);
+        drawArea(cacheGeo[id]);
         return;
       }
 
