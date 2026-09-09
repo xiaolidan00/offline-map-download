@@ -48,6 +48,7 @@ async function replaceColor(inputPath, outputPath) {
       //找到与替换颜色最小距离那个颜色
       for (let i = 0; i < targetColors.length; i++) {
         const {target, newColor} = targetColors[i];
+        //计算距离
         const distance = Math.sqrt(
           Math.pow(r - target[0], 2) + Math.pow(g - target[1], 2) + Math.pow(b - target[2], 2)
         );

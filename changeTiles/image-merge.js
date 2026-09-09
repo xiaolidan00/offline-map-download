@@ -9,7 +9,8 @@ async function mergeImages(imagePath, imageoverPath, distPath) {
         input: imageoverPath,
         top: 0, // 距离顶部的像素
         left: 0, // 距离左侧的像素
-        blend: 'over' // 混合模式 over覆盖，multiply叠底
+        blend: 'over' //over 覆盖在上方
+        // 混合模式blend,选项可以是 clear、source、over、in、out、atop、dest、dest-over、dest-in、dest-out、dest-atop、xor、add、saturate、multiply、screen、overlay、darken、lighten、colour-dodge、color-dodge、colour-burn 之一 ,color-burn、hard-light、soft-light、difference、exclusion。
       }
     ])
     .toFile(distPath);
