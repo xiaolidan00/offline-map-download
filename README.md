@@ -56,6 +56,8 @@
 2. 把标注瓦片放在`changeTiles/矢量底图`文件夹下，执行脚本`image-text.js`，处理后的瓦片会放在`换色标注`文件夹
 3. 执行脚本`image-merge.js`，合并后的瓦片会放在`叠加瓦片`文件夹
 
+其他来源的瓦片也是一样换色逻辑的，建议瓦片换色不要直接覆盖原文件，因为颜色配置可能需要一点点调整的。
+
 **参考**
 
 - jszip-https://stuk.github.io/jszip/
@@ -64,3 +66,4 @@
 - proj4leaflet-https://kartena.github.io/Proj4Leaflet/
 - 天地图-https://www.tianditu.gov.cn/
 - 高德地图-https://lbs.amap.com/api/javascript-api-v2/summary
+- sharp-`https://github.com/lovell/sharp`
