@@ -62,7 +62,7 @@ async function replaceColor(inputPath, outputPath) {
         }
       }
       if (!tag) {
-        //莫找到替换颜色，默认取平均值，处理成灰色
+        //没找到替换颜色，默认取平均值，处理成灰色
 
         //颜色与灰色相近不处理
         if (Math.abs(r - g) < MIN && Math.abs(r - b) < MIN && Math.abs(b - g) < MIN) {
