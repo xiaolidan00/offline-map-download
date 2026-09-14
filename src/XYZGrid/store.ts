@@ -6,7 +6,8 @@ export const defaultStore = {
   loading: false,
   current: 0,
   total: 0,
-  currentAction: ''
+  currentAction: '',
+  startIndex: 0
 };
 export const store = ref(cloneDeep(defaultStore));
 export const defaultmapconfig = {
@@ -31,8 +32,9 @@ export const defaultmapconfig = {
   maxLevel: 8,
   bounds: [] as any[],
   isFull: false,
-  isSplit: false,
-  spliteNum: 1000,
+  isSplit: true,
+  spliteNum: 500,
+
   areaBounds: [
     [0, 0],
     [0, 0]

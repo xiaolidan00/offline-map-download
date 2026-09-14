@@ -320,19 +320,19 @@
           )
         )
           return;
-        store.value.current = 0;
+        store.value.current = store.value.startIndex || 0;
         store.value.total = queue.length;
         store.value.loading = true;
         //分包下载
         if (state.value.isSplit) {
           const n = state.value.spliteNum;
-          for (let i = 0; i < queue.length; i = i + n) {
+          for (let i = store.value.current; i < queue.length; i = i + n) {
             const list = queue.slice(i, i + n);
             console.log(i, i + n, list.length);
             await downloadZip(list, i);
           }
         } else {
-          await downloadZip(queue, 0);
+          await downloadZip(queue, store.value.current);
         }
         store.value.loading = false;
       } else {

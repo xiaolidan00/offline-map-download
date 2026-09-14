@@ -68,7 +68,7 @@
         @change="onChange()"
       />
 
- <el-form-item label="绘制网格">
+      <el-form-item label="绘制网格">
         <el-checkbox v-model="state.isGrid" type="checkbox" @change="onChange()" />
       </el-form-item>
       <el-form-item label="自定义投影">
@@ -190,6 +190,18 @@
           />
         </div>
       </div>
+      <el-form-item
+        label="开始索引"
+        style="margin-top: 10px"
+        v-if="store.currentAction === 'download'"
+      >
+        <el-input
+          type="number"
+          style="width: calc(50% - 5px); margin-left: 10px"
+          v-model.number="store.startIndex"
+          @change="onChange()"
+        />
+      </el-form-item>
 
       <el-form-item
         label="拆分下载"
@@ -223,31 +235,36 @@
 
         <div class="geojson-item" v-for="(item, i) in state.geojsonList" :key="i">
           <div>
-            <i @click="item.show=!item.show" :class="[item.show?'active':'']">›</i>
-           <el-checkbox v-model="item.enable"></el-checkbox>
+            <i @click="item.show = !item.show" :class="[item.show ? 'active' : '']">›</i>
+            <el-checkbox v-model="item.enable"></el-checkbox>
             <span>{{ item.name }}【{{ item.data.features.length }}项】</span>
 
             <i @click="onDel(i)">×</i>
           </div>
           <div v-show="item.show">
-            
             <el-form-item label="是否描边">
               <el-checkbox v-model="item.stroke" @change="onChange()" />
             </el-form-item>
             <el-form-item label="描边颜色" v-if="item.stroke">
-              <input type="color" v-model="item.color"/> 
+              <input type="color" v-model="item.color" />
             </el-form-item>
             <el-form-item label="描边宽度" v-if="item.stroke">
               <el-input type="number" v-model.number="item.weight"></el-input>
             </el-form-item>
             <el-form-item label="描边透明度" v-if="item.stroke">
-              <el-input type="number" placeholder="默认1" :min="0" :max="1" v-model.number="item.opacity"></el-input>
+              <el-input
+                type="number"
+                placeholder="默认1"
+                :min="0"
+                :max="1"
+                v-model.number="item.opacity"
+              ></el-input>
             </el-form-item>
             <el-form-item label="是否填充">
               <el-checkbox v-model="item.fill"></el-checkbox>
             </el-form-item>
             <el-form-item label="填充颜色" v-if="item.fill">
-              <input type="color" v-model="item.fillColor"></input>
+              <input type="color" v-model="item.fillColor" />
             </el-form-item>
             <el-form-item label="填充透明度" v-if="item.fill">
               <el-input
@@ -261,23 +278,29 @@
             <el-form-item label="显示标签">
               <el-checkbox v-model="item.isText" @change="onChange()" />
             </el-form-item>
-            <el-form-item label="标签属性"   v-if="item.isText">
+            <el-form-item label="标签属性" v-if="item.isText">
               <el-input
                 clearable
-                placeholder="默认name|NAME|Name"              
+                placeholder="默认name|NAME|Name"
                 v-model="item.textProp"
                 @change="onChange()"
               />
             </el-form-item>
             <el-form-item label="文本显示层级" v-if="item.isText">
-              <el-input type="number"  placeholder="默认0" v-model.number="item.textLevel" :min="state.minZoom" :maxlength="state.maxZoom"></el-input>
+              <el-input
+                type="number"
+                placeholder="默认0"
+                v-model.number="item.textLevel"
+                :min="state.minZoom"
+                :maxlength="state.maxZoom"
+              ></el-input>
             </el-form-item>
 
-            <el-form-item label="文本偏移"  v-if="item.isText">
+            <el-form-item label="文本偏移" v-if="item.isText">
               <el-input
                 type="number"
                 v-model.number="item.offsetX"
-                placeholder="偏移X"                
+                placeholder="偏移X"
                 style="width: 80px; margin-right: 5px"
               ></el-input>
               <el-input
@@ -287,16 +310,23 @@
                 style="width: 80px"
               ></el-input>
             </el-form-item>
-            <el-form-item label="字体颜色"  v-if="item.isText">
-              <input type="color" v-model="item.fontColor"/> 
+            <el-form-item label="字体颜色" v-if="item.isText">
+              <input type="color" v-model="item.fontColor" />
             </el-form-item>
             <el-form-item label="字体大小" v-if="item.isText">
-              <el-input type="number" placeholder="默认12" v-model.number="item.fontSize"></el-input>
+              <el-input
+                type="number"
+                placeholder="默认12"
+                v-model.number="item.fontSize"
+              ></el-input>
             </el-form-item>
           </div>
         </div>
       </div>
-      <div v-if="store.currentAction==='download'&&state.isSplit" style="font-size: 12px; color: red">
+      <div
+        v-if="store.currentAction === 'download' && state.isSplit"
+        style="font-size: 12px; color: red"
+      >
         请关闭浏览器【下载前询问每个文件的保存位置】。请允许网页权限【自动下载项】！
       </div>
     </el-form>
@@ -405,7 +435,14 @@
           if (str) {
             try {
               const data = JSON.parse(str) as any;
-              state.value.geojsonList.push({enable:true,name: file.name, data,show:true, stroke: false, fill: false});
+              state.value.geojsonList.push({
+                enable: true,
+                name: file.name,
+                data,
+                show: true,
+                stroke: false,
+                fill: false
+              });
             } catch (error) {
               console.log(error);
             }
