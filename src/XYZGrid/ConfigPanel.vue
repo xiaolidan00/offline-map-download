@@ -118,6 +118,7 @@
         popper-class="cascader-custom-header"
         :options="adcodes"
         placeholder="请选择区域"
+        filterable
         clearable
         :props="{
           label: 'name',
